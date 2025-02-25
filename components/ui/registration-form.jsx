@@ -10,9 +10,12 @@ import { createUser } from "@/appWrite";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import AnimatedError from "./animatedError";
+import { useState } from "react";
 
 export function RegistrationForm({ className, ...props }) {
   const router = useRouter();
+  const [ServerError, setServerError] = useState(null)
   const {
     register,
     handleSubmit,
@@ -30,6 +33,9 @@ export function RegistrationForm({ className, ...props }) {
         },
       });
       router.push("/login");
+    }
+    else {
+      setServerError(req.message)
     }
   };
 
@@ -97,6 +103,9 @@ export function RegistrationForm({ className, ...props }) {
         <Button disabled={isSubmitting} type="submit" className="w-full">
           {isSubmitting ? <Loader2 className="animate-spin" /> : "Sign Up"}
         </Button>
+
+
+        <AnimatedError error={ServerError} />
         <div className="relative flex items-center justify-center text-sm">
           <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
           <span className="z-10 bg-dark px-2 dark:bg-neutral-950 dark:text-white">

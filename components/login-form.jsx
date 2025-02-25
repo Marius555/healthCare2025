@@ -10,8 +10,10 @@ import { Loader2 } from "lucide-react";
 import { loginWithEmail } from "@/appWrite";
 import { useState } from "react";
 import AnimatedError from "./ui/animatedError";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({ className, ...props }) {
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -23,6 +25,8 @@ export function LoginForm({ className, ...props }) {
     const req = await loginWithEmail(values);
     if (req.success) {
       localStorage.setItem("auth", JSON.stringify(req.data));
+      router.push("/onboarding");
+
     }
     else{
       setresponseError(req.message)
@@ -59,6 +63,7 @@ export function LoginForm({ className, ...props }) {
             id="email"
             type="email"
             placeholder="m@example.com"
+            autoComplete="email"
             required
             onInput={handleValidation("email")}
             {...register("email")}
@@ -78,6 +83,7 @@ export function LoginForm({ className, ...props }) {
             id="password"
             type="password"
             required
+            autoComplete="current-password"
             onInput={handleValidation("password")}
             {...register("password")}
             placeholder="Your password"
@@ -90,7 +96,6 @@ export function LoginForm({ className, ...props }) {
 
         <AnimatedError error={responseError}/>
         
-
         <div className="relative flex items-center justify-center text-sm">
           <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
           <span className="z-10 bg-dark px-2 dark:bg-neutral-950 dark:text-white">

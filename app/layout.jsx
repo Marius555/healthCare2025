@@ -3,7 +3,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-dark";
 import { Toaster } from "sonner";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,7 +29,8 @@ export default function RootLayout({ children }) {
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
-        >{children}
+        >
+          {children}
         
         </ThemeProvider>
         <Toaster />
