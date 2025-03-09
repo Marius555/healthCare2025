@@ -29,9 +29,12 @@ const generateRandomString = (length = 25) => {
   return result;
 };
 
-const StepOne = ({ stepper, currentIndex }) => {
-  const [user, setUser] = useState(null);
+const StepOne = ({ stepper, currentIndex, userId }) => {
+  
   const [previewUrl, setPreviewUrl] = useState("https://github.com/shadcn.png");
+
+
+
   const [defaultValues, setDefaultValues] = useState({
     name: "",
     lastName: "",
@@ -41,7 +44,7 @@ const StepOne = ({ stepper, currentIndex }) => {
     picture: null,
     type: "doctor",
     pictureName: [], // Changed to array
-    userId: "",
+    userId: userId.id,
   });
 
   const {
@@ -53,18 +56,10 @@ const StepOne = ({ stepper, currentIndex }) => {
   } = useForm({
     defaultValues: defaultValues,
     resolver: yupResolver(stepOneSchema),
+    
   });
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storage = localStorage.getItem("auth");
-      if (storage) {
-        const parsedUser = JSON.parse(storage);
-        setUser(parsedUser);
-        setValue("userId", parsedUser.userId);
-      }
-    }
-  }, [setValue]);
+
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];

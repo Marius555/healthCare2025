@@ -13,6 +13,8 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import NavBarUserSection from "./navBarUserSection";
+
 
 const components = [
   {
@@ -52,7 +54,7 @@ const components = [
   },
 ];
 
-function Navbar() {
+function Navbar({isUser, user}) {
   return (
     <nav className="flex justify-between items-center p-4 border-b">
       <NavigationMenu>
@@ -113,10 +115,7 @@ function Navbar() {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <div className="flex space-x-4">
-        <Link href="/login" className="px-4 py-2 dark:bg-black bg-white  dark:text-white text-black rounded-md ">Login</Link>
-        <Link href="/registration" className="px-4 py-2 dark:bg-black bg-secondary  dark:text-white text-white rounded-md">Sign Up</Link>
-      </div>
+      <NavBarUserSection isUser={isUser} user={user}/>
     </nav>
   );
 }

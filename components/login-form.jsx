@@ -11,6 +11,7 @@ import { loginWithEmail } from "@/appWrite";
 import { useState } from "react";
 import AnimatedError from "./ui/animatedError";
 import { useRouter } from "next/navigation";
+import { AppwriteLoginServer } from "@/appwriteUtils/appwriteLoginServer";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter()
@@ -18,14 +19,14 @@ export function LoginForm({ className, ...props }) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting,  },
-  } = useForm({ resolver: yupResolver(loginResolver) });
+  } = useForm({ resolver: yupResolver(loginResolver), mode: "onChange" });
   const [responseError, setresponseError] = useState(null)
 
   const login = async (values) => {
-    const req = await loginWithEmail(values);
-    if (req.success) {
-      localStorage.setItem("auth", JSON.stringify(req.data));
-      router.push("/onboarding");
+    const req = await AppwriteLoginServer(values);
+    if (req.success && req.type && req.collectionId) {
+      console.log("front", req)
+      router.push(`/auth/${req.type}/dashboard/${req.collectionId}`);
 
     }
     else{
@@ -33,19 +34,9 @@ export function LoginForm({ className, ...props }) {
     }
   };
 
-  const handleValidation = (name) => {
-    // Set custom validity based on React Hook Form errors
-    return (e) => {
-      if (errors[name]) {
-        e.target.setCustomValidity(errors[name]?.message || "");
-      } else {
-        e.target.setCustomValidity("");
-      }
-    };
-  };
-
   return (
     <form
+      noValidate
       onSubmit={handleSubmit(login)}
       className={cn("flex flex-col gap-6", className)}
       {...props}
@@ -65,10 +56,10 @@ export function LoginForm({ className, ...props }) {
             placeholder="m@example.com"
             autoComplete="email"
             required
-            onInput={handleValidation("email")}
             {...register("email")}
           />
         </div>
+        <AnimatedError error={errors?.email?.message}/>
         <div className="grid gap-2">
           <div className="flex items-center">
             <Label htmlFor="password">Password</Label>
@@ -84,10 +75,10 @@ export function LoginForm({ className, ...props }) {
             type="password"
             required
             autoComplete="current-password"
-            onInput={handleValidation("password")}
             {...register("password")}
             placeholder="Your password"
           />
+          <AnimatedError error={errors?.email?.message}/>
         </div>
 
         <Button disabled={isSubmitting} type="submit" className="w-full">

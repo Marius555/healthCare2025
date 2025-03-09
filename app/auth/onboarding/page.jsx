@@ -19,7 +19,7 @@ const page = () => {
           height={400}
         />
         <Button className=" w-full font-bold" asChild>
-          <Link href="/onboarding/doctor">Doctor</Link>
+          <Link href="/auth/onboarding/doctor">Doctor</Link>
         </Button>
         <Button className=" w-full font-bold">Patient</Button>
         <Button className="w-full font-bold">

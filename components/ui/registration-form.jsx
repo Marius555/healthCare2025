@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import AnimatedError from "./animatedError";
 import { useState } from "react";
+import { appwriteCreateUserServer } from "@/appwriteUtils/apwriteCreateUserServer";
+
 
 export function RegistrationForm({ className, ...props }) {
   const router = useRouter();
@@ -20,38 +22,30 @@ export function RegistrationForm({ className, ...props }) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm({ resolver: yupResolver(registrationSchemaResolver) });
+  } = useForm({ resolver: yupResolver(registrationSchemaResolver), mode: "onChange" });
 
   const submit = async (values) => {
-    const req = await createUser(values);
+    const req = await appwriteCreateUserServer(values);
     if (req.success) {
       toast("User Have Been Created Successfully", {
-        description: "Please Login to Continue",
+        description: "Please Check Your Email To Verify Your Account",
         action: {
           label: "Close",
           onClick: () => console.log("Close"),
         },
       });
-      router.push("/login");
+      router.push("/auth/onboarding");
     }
     else {
       setServerError(req.message)
     }
   };
 
-  const handleValidation = (name) => {
-    // Set custom validity based on React Hook Form errors
-    return (e) => {
-      if (errors[name]) {
-        e.target.setCustomValidity(errors[name]?.message || "");
-      } else {
-        e.target.setCustomValidity("");
-      }
-    };
-  };
+
 
   return (
     <form
+      noValidate
       onSubmit={handleSubmit(submit)}
       className={cn("flex flex-col gap-6", className)}
       {...props}
@@ -67,12 +61,13 @@ export function RegistrationForm({ className, ...props }) {
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
-            onInput={handleValidation("email")}
+        
             {...register("email")}
             type="email"
             placeholder="m@example.com"
             required
           />
+          <AnimatedError error={errors?.email?.message} />
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
@@ -81,11 +76,12 @@ export function RegistrationForm({ className, ...props }) {
           <Input
             id="password"
             {...register("password")}
-            onInput={handleValidation("password")}
+          
             type="password"
             placeholder="password"
             required
           />
+          <AnimatedError error={errors?.password?.message} />
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
@@ -94,11 +90,11 @@ export function RegistrationForm({ className, ...props }) {
           <Input
             id="password-confirm"
             {...register("repeatPassword")}
-            onInput={handleValidation("repeatPassword")}
             type="password"
             placeholder="Confirm Password"
             required
           />
+          <AnimatedError error={errors?.repeatPassword?.message} />
         </div>
         <Button disabled={isSubmitting} type="submit" className="w-full">
           {isSubmitting ? <Loader2 className="animate-spin" /> : "Sign Up"}

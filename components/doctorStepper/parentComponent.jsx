@@ -28,7 +28,7 @@ const { useStepper, steps, utils } = defineStepper(
   { id: "complete", title: "Complete", description: "Checkout complete" }
 );
 
-export default function Page() {
+export default function ParentComponent({userId}) {
   const stepper = useStepper();
   const currentIndex = utils.getIndex(stepper.current.id);
 
@@ -49,7 +49,7 @@ export default function Page() {
         
         <div className="space-y-6 p-6">
           {stepper.switch({
-            Details: () => <StepOne stepper={stepper} currentIndex={currentIndex}/>,
+            Details: () => <StepOne stepper={stepper} currentIndex={currentIndex} userId={userId}/>,
             Education: () => <StepTwo stepper={stepper} currentIndex={currentIndex}/>,
             complete: () => <StepThree />,
           })}
