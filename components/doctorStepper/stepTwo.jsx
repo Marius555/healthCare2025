@@ -18,8 +18,11 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { stepTwoSchema } from "@/resolvers/doctorStepper/StepTwo";
 import { useEffect } from "react";
-import { CreateNewDoctorEducation } from "@/appWrite";
 import { Loader2 } from "lucide-react";
+import CreateNewDoctorEducationServer from "@/appwriteUtils/createDoctorEducationServer";
+
+
+
 
 const StepTwo = ({ stepper, currentIndex }) => {
   const universitys = [
@@ -184,7 +187,7 @@ const StepTwo = ({ stepper, currentIndex }) => {
 
 
   const submit = async(data) => {
-    const resp = await CreateNewDoctorEducation(data)
+    const resp = await CreateNewDoctorEducationServer(data)
     if(resp.success){
       console.log(resp.message)
       stepper.next()
@@ -362,14 +365,8 @@ const StepTwo = ({ stepper, currentIndex }) => {
         <div className="space-y-4">
           {!stepper.isLast ? (
             <div className="flex justify-end gap-4">
-              <Button
-                variant="secondary"
-                onClick={stepper.prev}
-                disabled={stepper.isFirst}
-              >
-                Back
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
+            
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {stepper.isLast ? "Complete" : "Next"}
                 {isSubmitting && <Loader2 className="animate-spin" />}
               </Button>

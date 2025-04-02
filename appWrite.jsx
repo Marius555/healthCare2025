@@ -102,11 +102,9 @@ export const createUser = async (data) => {
         appConfig.DoctorCompanyId,
         ID.unique(),
         {
-          companyName: data.companyName,
-          companyWebsite: data.companyWebsite,
-          primaryWorkplace: data.primaryWorkplace,
-          startWorking: data.startWorking,
-          birthDay: data.birthDay,
+          country: data.country,
+          multipleJobs: data.multipleJobs,
+          experience: data.experience,
           workDescription: data.workDescription,
           userId: data.userId,
         }

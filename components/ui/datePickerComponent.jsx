@@ -42,7 +42,7 @@ export default function CalendarDropdownButton({value, onChange, label, ...props
         <Button
           variant={"outline"}
           className={cn(
-            "w-[280px] justify-start text-left font-normal bg-transparent hover:bg-transparent"
+            "w-auto justify-start text-left font-normal bg-transparent hover:bg-transparent"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -58,7 +58,7 @@ export default function CalendarDropdownButton({value, onChange, label, ...props
           initialFocus
           showOutsideDays={true}
           captionLayout="dropdown-buttons"
-          fromYear={1900} 
+          fromYear={1950} 
           toYear={2025}
           className="rounded-md border"
         />

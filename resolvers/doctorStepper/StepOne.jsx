@@ -18,9 +18,8 @@ export const stepOneSchema = yup.object().shape({
   type: yup.string().required("Type is required"),
   userId: yup.string().required("userId is required"),
   pictureName: yup.array()
-  .of(yup.string().required("Each picture name must be a string"))
-  .min(1, "At least one picture name is required")  // If you want to ensure the array isn't empty
-  .required("picture name is required"),
+  .of(yup.string().required("Each picture name must be a string")),
+
   birthDay: yup
     .date("Date Must Be Valid")
     .required("Date of birth is required")

@@ -22,7 +22,6 @@ export async function AppwriteLoginServer(data) {
       const check = await appwriteCheckIfDoctorExists(session?.userId);
       return { success: true, message: "User Login Successfully", type: check.type, collectionId: check.$id };
     }
-    return { success: true, message: "User Login Successfully" };
   } catch (error) {
     return { success: false, message: error.message || "An error occurred" };
   }

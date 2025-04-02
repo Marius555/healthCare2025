@@ -16,6 +16,7 @@ import { appwriteCreateUserServer } from "@/appwriteUtils/apwriteCreateUserServe
 
 
 export function RegistrationForm({ className, ...props }) {
+  const [isSigningUp, setisSigningUp] = useState(false)
   const router = useRouter();
   const [ServerError, setServerError] = useState(null)
   const {
@@ -25,7 +26,9 @@ export function RegistrationForm({ className, ...props }) {
   } = useForm({ resolver: yupResolver(registrationSchemaResolver), mode: "onChange" });
 
   const submit = async (values) => {
+    setisSigningUp(true)
     const req = await appwriteCreateUserServer(values);
+    
     if (req.success) {
       toast("User Have Been Created Successfully", {
         description: "Please Check Your Email To Verify Your Account",
@@ -38,6 +41,7 @@ export function RegistrationForm({ className, ...props }) {
     }
     else {
       setServerError(req.message)
+      setisSigningUp(false)
     }
   };
 
@@ -66,6 +70,7 @@ export function RegistrationForm({ className, ...props }) {
             type="email"
             placeholder="m@example.com"
             required
+            autoComplete="email"
           />
           <AnimatedError error={errors?.email?.message} />
         </div>
@@ -76,7 +81,7 @@ export function RegistrationForm({ className, ...props }) {
           <Input
             id="password"
             {...register("password")}
-          
+            autoComplete="new-password"
             type="password"
             placeholder="password"
             required
@@ -92,12 +97,13 @@ export function RegistrationForm({ className, ...props }) {
             {...register("repeatPassword")}
             type="password"
             placeholder="Confirm Password"
+            autoComplete="new-password"
             required
           />
           <AnimatedError error={errors?.repeatPassword?.message} />
         </div>
-        <Button disabled={isSubmitting} type="submit" className="w-full">
-          {isSubmitting ? <Loader2 className="animate-spin" /> : "Sign Up"}
+        <Button disabled={isSigningUp} type="submit" className="w-full">
+          {isSigningUp ? <Loader2 className="animate-spin" /> : "Sign Up"}
         </Button>
 
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import CalendarDropdownButton from "../ui/datePickerComponent";
@@ -14,9 +14,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import FileInput from "../FileInput";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CreateNewDoctor } from "@/appWrite";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createProfilePicture } from "@/appWrite";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
+import createNewDoctorServer from "@/appwriteUtils/createNewDoctorServer";
+import CreateProfilePictureServer from "@/appwriteUtils/createProfilePictureServer";
+import PhoneField from "../phoneField";
 
 // Function to generate random string
 const generateRandomString = (length = 25) => {
@@ -32,8 +35,7 @@ const generateRandomString = (length = 25) => {
 const StepOne = ({ stepper, currentIndex, userId }) => {
   
   const [previewUrl, setPreviewUrl] = useState("https://github.com/shadcn.png");
-
-
+  const fileInputRef = useRef(null);
 
   const [defaultValues, setDefaultValues] = useState({
     name: "",
@@ -59,8 +61,6 @@ const StepOne = ({ stepper, currentIndex, userId }) => {
     
   });
 
-
-
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -70,8 +70,11 @@ const StepOne = ({ stepper, currentIndex, userId }) => {
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
       setValue("picture", renamedFile);
-      setValue("pictureName", [randomFileName]);
     }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current.click();
   };
 
   const submit = async (data) => {
@@ -84,10 +87,10 @@ const StepOne = ({ stepper, currentIndex, userId }) => {
           : [data.pictureName],
       };
 
-      const resp = await CreateNewDoctor(submissionData);
+      const resp = await createNewDoctorServer(submissionData);
       if (resp.success) {
-        createProfilePicture(pictureData);
-        sessionStorage.setItem("doctorCollId", JSON.stringify(resp.data.$id));
+        CreateProfilePictureServer(pictureData);
+        sessionStorage.setItem("doctorCollId", JSON.stringify(resp.doctorId));
         stepper.next();
       }
     } catch (error) {
@@ -97,20 +100,29 @@ const StepOne = ({ stepper, currentIndex, userId }) => {
 
   return (
     <form onSubmit={handleSubmit(submit)}>
-      <div className="flex flex-col gap-1">
-        <div className="flex flex-row items-center gap-4">
+      <div className="flex flex-col gap-1 ">
+        <div className="flex flex-row items-center justify-center gap-4">
           <div>
-            <Avatar className="w-20 h-20">
-              <AvatarImage src={previewUrl} className="object-cover"/>
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </div>
-          <div className="w-full">
-            <Input
-              className="p-0 pe-3 file:me-3 file:border-0 file:border-e"
+            <div 
+              className="relative cursor-pointer group" 
+              onClick={handleAvatarClick}
+            >
+              <Avatar className="w-20 h-20 ">
+                <AvatarImage 
+                  src={previewUrl} 
+                  className="object-cover group-hover:blur-sm"
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <Plus className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <input
+              ref={fileInputRef}
               type="file"
-              accept="image/*"
               onChange={handleFileChange}
+              className="hidden"
             />
           </div>
         </div>
@@ -154,7 +166,7 @@ const StepOne = ({ stepper, currentIndex, userId }) => {
             name="phoneNumber"
             control={control}
             render={({ field }) => (
-              <PhoneInput {...field} placeholder="Enter a phone number" />
+              <PhoneField {...field} placeholder="Enter a phone number" />
             )}
           />
           <div className="h-5">
@@ -166,8 +178,8 @@ const StepOne = ({ stepper, currentIndex, userId }) => {
           </div>
         </div>
 
-        <div className="flex flex-row items-center gap-3">
-          <div className="grid w-full items-center gap-1.5">
+        <div className="flex flex-col items-center">
+          <div className="grid w-full items-center">
             <Controller
               name="nationality"
               control={control}
@@ -182,7 +194,7 @@ const StepOne = ({ stepper, currentIndex, userId }) => {
             </div>
           </div>
 
-          <div className="grid w-auto items-center gap-1.5">
+          <div className="grid w-full items-center">
             <Controller
               name="birthDay"
               control={control}
@@ -203,26 +215,17 @@ const StepOne = ({ stepper, currentIndex, userId }) => {
           </div>
         </div>
         <div className="h-5">
-              {errors && (
-                <p className="text-red-500 text-xs">
-                  {errors.message}
-                </p>
-              )}
-            </div>
-
-      
+          {errors && (
+            <p className="text-red-500 text-xs">
+              {errors.message}
+            </p>
+          )}
+        </div>
 
         <div className="space-y-4">
           {!stepper.isLast ? (
             <div className="flex justify-end gap-4">
-              <Button
-                variant="secondary"
-                onClick={stepper.prev}
-                disabled={stepper.isFirst}
-              >
-                Back
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {stepper.isLast ? "Complete" : "Next"}
                 {isSubmitting && <Loader2 className="animate-spin" />}
               </Button>

@@ -19,7 +19,10 @@ import UserSection from "@/components/doctorDashboard/userSection"
 import ProfileViews from "@/components/doctorDashboard/profileViews"
 import TableSection from "@/components/doctorDashboard/tableSection"
 
-export default function Page() {
+export default async function Page({params}) {
+  const resolvedParams = await params;
+  const id = resolvedParams?.id;
+  
   return (
     <SidebarProvider>
       <AppSidebar />

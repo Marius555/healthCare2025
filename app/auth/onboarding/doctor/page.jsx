@@ -5,8 +5,8 @@ import appwriteCheckIfDoctorExists from '@/appwriteUtils/appwriteCheckIfDoctorEx
 
 const page = async() => {
   const id = await GetIdFromCookie()
-  const  userId  = id.id
-  const user = await appwriteCheckIfDoctorExists(userId)
+  // const  userId  = id.id
+  // const user = await appwriteCheckIfDoctorExists(userId)
 
   return (
     <>

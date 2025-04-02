@@ -29,19 +29,53 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useRouter } from "next/navigation";
+import CountrySelect from "./country/countrySelect";
+import AnimatedError from "../ui/animatedError";
+import { cn } from "@/lib/utils";
+
+const ExperienceRadioGroup = ({ value, onChange, error }) => {
+  const options = [
+    { value: "<1 year", label: "< 1 year" },
+    { value: "<5 years", label: "< 5 years" },
+    { value: "<10 years", label: "< 10 years" },
+    { value: "<20 years", label: "< 20 years" },
+    { value: ">20 years", label: "> 20 years" },
+  ];
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium">Experience</Label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((option) => (
+          <div
+            key={option.value}
+            className={cn(
+              "cursor-pointer inline-flex items-center rounded-md border border-input px-3 py-1.5 text-sm font-medium transition-colors",
+              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+              value === option.value
+                ? "bg-primary/10 text-primary border-primary"
+                : "bg-transparent"
+            )}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </div>
+        ))}
+      </div>
+      <AnimatedError error={error} />
+    </div>
+  );
+};
 
 const StepThree = ({ stepper, currentIndex }) => {
   const [defaultValues, setDefaultValues] = useState({
-    companyName: "",
-    companyWebsite: "",
+    country: "",
     workDescription: "",
-    primaryWorkplace: false,
-    startWorking: "",
+    experience: undefined,
+    multipleJobs: false,
     userId: "",
   });
   const router = useRouter();
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1949 }, (_, i) => 1950 + i);
 
   const {
     register,
@@ -65,123 +99,84 @@ const StepThree = ({ stepper, currentIndex }) => {
   }, [setValue]);
 
   const submit = async (data) => {
+    console.log(data);
     const req = await CreateNewDoctorCompany(data);
     if (req.success) {
-      router.push("/auth/doctor/dashboard");
+      stepper.next();
     }
   };
 
   return (
     <form onSubmit={handleSubmit(submit)}>
-      <div className="flex flex-col gap-1">
-        <div className="flex flex-row gap-1">
-          <div className="w-full">
-            <Input
-              id="companyName"
-              {...register("companyName")}
-              placeholder="Company Name"
-            />
-
-            <div className="h-5">
-              {errors.companyName && (
-                <p className="text-red-500 text-xs">
-                  {errors.companyName.message}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="w-full">
-            <div className="relative">
-              <Input
-                className="peer ps-16"
-                placeholder="google.com"
-                type="text"
-                {...register("companyWebsite")}
-              />
-              <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-sm  peer-disabled:opacity-50">
-                https://
-              </span>
-            </div>
-            <div className="h-5">
-              {errors.companyWebsite && (
-                <p className="text-red-500 text-xs">
-                  {errors.companyWebsite.message}
-                </p>
-              )}
-            </div>
-          </div>
+      <div className="flex flex-col items-center gap-5">
+        <div className="grid w-full items-center gap-1.5">
+          <Controller
+            name="country"
+            control={control}
+            render={({ field }) => <CountrySelect {...field} />}
+          />
+          <AnimatedError error={errors?.country?.message} />
         </div>
+
         <div className="w-full">
           <Textarea
             {...register("workDescription")}
             placeholder="Short job description"
           />
-          <div className="h-5">
-            {errors.workDescription && (
-              <p className="text-red-500 text-xs">
-                {errors.workDescription.message}
-              </p>
-            )}
-          </div>
+          <AnimatedError error={errors?.workDescription?.message} />
         </div>
+
         <div className="w-full">
           <Controller
-            name="startWorking"
+            name="experience"
             control={control}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Started Working" />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((y) => (
-                    <SelectItem key={y} value={String(y)}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ExperienceRadioGroup
+                value={field.value}
+                onChange={field.onChange}
+                error={errors?.experience?.message}
+              />
             )}
           />
-          <div className="h-5">
-            {errors.startWorking && (
-              <p className="text-red-500 text-xs">
-                {errors.startWorking.message}
-              </p>
+        </div>
+
+        <div className="flex flex-row ml-1 w-full">
+          <Controller
+            name="multipleJobs"
+            control={control}
+            render={({ field: { value, onChange, ...restField } }) => (
+              <div className="items-center flex space-x-2">
+                <Checkbox
+                  id="multipleJobs"
+                  checked={value}
+                  onCheckedChange={onChange}
+                  {...restField}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="multipleJobs"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Working In Several Companys?
+                  </label>
+                </div>
+              </div>
             )}
-          </div>
-          <div>
-            <div className="flex flex-row items-center ml-1">
-              <Controller
-                name="primaryWorkplace"
-                control={control}
-                render={({ field: { value, onChange, ...restField } }) => (
-                  <div className="items-center flex space-x-2">
-                    <Checkbox
-                      id="primaryWorkplace"
-                      checked={value}
-                      onCheckedChange={onChange}
-                      {...restField}
-                    />
-                    <div className="grid gap-1.5 leading-none">
-                      <label
-                        htmlFor="primaryWorkplace"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Is primary workplace?
-                      </label>
-                    </div>
-                  </div>
-                )}
-              />
-            </div>
-          </div>
+          />
         </div>
       </div>
-      <Button type="submit" disabled={isSubmitting}>
-        Complete
-        {isSubmitting && <Loader2 className="animate-spin" />}
-      </Button>
+      <div className="mt-5 flex">
+        {!stepper.isLast ? (
+          <div className="flex gap-4 w-full">
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {stepper.isLast ? "Complete" : "Next"}
+              {isSubmitting && <Loader2 className="animate-spin" />}
+            </Button>
+          </div>
+        ) : (
+          <Button onClick={stepper.reset}>Reset</Button>
+        )}
+      </div>
     </form>
   );
 };

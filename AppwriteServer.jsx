@@ -1,6 +1,7 @@
 "use server"
-import { Client, Account, Databases } from "node-appwrite";
+import { Client, Account, Databases, Storage } from "node-appwrite";
 import { cookies } from "next/headers";
+import { get } from "react-hook-form";
 
 export async function createSessionClient() {
   const client = new Client()
@@ -16,6 +17,7 @@ export async function createSessionClient() {
   client.setSession(session.value);
 
   const databases = new Databases(client);
+  const storage = new Storage(client);
 
   return {
     get account() {
@@ -23,6 +25,9 @@ export async function createSessionClient() {
     },
     get databases() {
       return databases;
+    },
+    get storage() {
+      return storage;
     }
   };
 }

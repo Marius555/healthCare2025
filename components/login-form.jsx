@@ -15,6 +15,7 @@ import { AppwriteLoginServer } from "@/appwriteUtils/appwriteLoginServer";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter()
+  const [isLogin, setisLogin] = useState(false)
   const {
     register,
     handleSubmit,
@@ -23,14 +24,14 @@ export function LoginForm({ className, ...props }) {
   const [responseError, setresponseError] = useState(null)
 
   const login = async (values) => {
+    setisLogin(true)
     const req = await AppwriteLoginServer(values);
     if (req.success && req.type && req.collectionId) {
-      console.log("front", req)
       router.push(`/auth/${req.type}/dashboard/${req.collectionId}`);
-
     }
     else{
       setresponseError(req.message)
+      setisLogin(false)
     }
   };
 
@@ -47,7 +48,7 @@ export function LoginForm({ className, ...props }) {
           Enter your email below to login to your account
         </p>
       </div>
-      <div className="grid gap-6">
+      <div className="grid gap-4">
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -60,7 +61,7 @@ export function LoginForm({ className, ...props }) {
           />
         </div>
         <AnimatedError error={errors?.email?.message}/>
-        <div className="grid gap-2">
+        <div className="grid gap-4">
           <div className="flex items-center">
             <Label htmlFor="password">Password</Label>
             <a
@@ -78,11 +79,11 @@ export function LoginForm({ className, ...props }) {
             {...register("password")}
             placeholder="Your password"
           />
-          <AnimatedError error={errors?.email?.message}/>
+          <AnimatedError error={errors?.password?.message}/>
         </div>
 
-        <Button disabled={isSubmitting} type="submit" className="w-full">
-          {isSubmitting ? <Loader2 className="animate-spin" /> : "Login"}
+        <Button disabled={isLogin} type="submit" className="w-full">
+          {isLogin ? <Loader2 className="animate-spin" /> : "Login"}
         </Button>
 
         <AnimatedError error={responseError}/>
